@@ -1,9 +1,14 @@
 package ptr_tools
 
-import (
-	"github.com/Riven-Spell/generic/internal"
-)
+func EnsureWithZero[T any](in *T) *T {
+	var Zero T
+	return EnsureWithDefault(in, Zero)
+}
 
-func EnsureNotNil[T any](in *T, Default T) *T {
-	return internal.EnsureNotNil(in, Default)
+func EnsureWithDefault[T any](in *T, Default T) *T {
+	if in == nil {
+		return &Default
+	}
+
+	return in
 }
