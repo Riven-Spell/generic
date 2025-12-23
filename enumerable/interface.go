@@ -5,7 +5,7 @@ import "github.com/Riven-Spell/generic/list_tools"
 // interface.go should serve as the interface to the enumerable package, a hub to discover the rest of the package via.
 // Unfortunately, because the semantics of methods and generics,
 // it is impossible to have one function perfectly chain onto another. i.e. There can never be a FromFunc().Zip() or whatnot,
-// which means it mostly has to be done backwards... Zip(Map(FromList(x), func()...), y). This is a huge mess, and it's recommended to just do it line by line, i.e.
+// which means it mostly has to be done backwards... Zip(Map(FromList(x), func()...), y). This is a huge mess, and it's recommended to just do it line by line.
 
 // RawInterface serves for interacting with the Interface at a type-free level.
 // It is not used within the package currently, but is provided as a convenience to end users.
