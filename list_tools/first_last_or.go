@@ -13,3 +13,15 @@ func FirstOrDefault[T any](list []T, Default T) T {
 func FirstOrZero[T any](list []T) (zero T) {
 	return FirstOrDefault(list, zero)
 }
+
+func LastOrDefault[T any](list []T, Default T) T {
+	if len(list) > 0 {
+		return list[len(list)-1]
+	}
+
+	return Default
+}
+
+func LastOrZero[T any](list []T) (zero T) {
+	return LastOrDefault(list, zero)
+}
