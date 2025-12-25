@@ -91,6 +91,14 @@ func Flatten[T any](Source Interface[[]T]) Interface[T] {
 	}
 }
 
+// ForEach fully executes an incoming Interface returning no values, and performing the requested operation on each value
+func ForEach[T any](Source Interface[T], do func(T)) {
+	Sum[T, any](Source, func(t T, _ any) any {
+		do(t)
+		return nil
+	})
+}
+
 // Sum reduces an incoming Interface down to a single value, passing the next item and
 func Sum[I, O any](Source Interface[I], operator func(I, O) O) O {
 	var out O
