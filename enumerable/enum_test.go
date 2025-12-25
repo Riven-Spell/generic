@@ -14,6 +14,13 @@ func TestFromList(t *testing.T) {
 	a.Equal(in, Collect(FromList(in, true)))
 }
 
+func TestFromMap(t *testing.T) {
+	a := assert.New(t)
+	in := map[string]string{"foo": "bar", "asdf": "aoeu", "yourbases": "belongtous"}
+
+	a.Equal(in, CollectMap(FromMap(in)))
+}
+
 func TestFromFunc(t *testing.T) {
 	a := assert.New(t)
 	result := []int{0, 1, 2, 3, 4}

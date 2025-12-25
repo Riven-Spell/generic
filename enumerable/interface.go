@@ -1,6 +1,9 @@
 package enumerable
 
-import "github.com/Riven-Spell/generic/list_tools"
+import (
+	"github.com/Riven-Spell/generic/dict_tools"
+	"github.com/Riven-Spell/generic/list_tools"
+)
 
 // interface.go should serve as the interface to the enumerable package, a hub to discover the rest of the package via.
 // Unfortunately, because the semantics of methods and generics,
@@ -34,10 +37,32 @@ func FromList[O any](in []O, clone bool) Interface[O] {
 		in = list_tools.Clone(in)
 	}
 
-	return &listEnumerator[O]{
-		Impl{},
-		in,
-	}
+	return FromFunc(func() (out O, ok bool) {
+		for _, v := range in {
+			out = v
+			ok = true
+			break
+		}
+
+		return
+	})
+}
+
+// FromMap creates a new Interface that emits all key value pairs in a semi-random order
+// (depending on whichever order Golang returns them)
+func FromMap[A comparable, B any](src map[A]B) Interface[AB[A, B]] {
+	src = dict_tools.Clone(src)
+
+	return FromFunc(func() (out AB[A, B], ok bool) {
+		for k, v := range src {
+			delete(src, k)
+			out.A, out.B = k, v
+			ok = true
+			break
+		}
+
+		return
+	})
 }
 
 // Zip makes no assurances about the length of either Interface.
@@ -83,5 +108,11 @@ func Sum[I, O any](Source Interface[I], operator func(I, O) O) O {
 func Collect[O any](source Interface[O]) []O {
 	return Sum[O, []O](source, func(object O, list []O) []O {
 		return append(list, object)
+	})
+}
+
+func CollectMap[A comparable, B any](Source Interface[AB[A, B]]) map[A]B {
+	return Sum[AB[A, B], map[A]B](Source, func(a AB[A, B], m map[A]B) map[A]B {
+		return dict_tools.SafeAdd(m, a.A, a.B)
 	})
 }
