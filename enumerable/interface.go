@@ -83,6 +83,14 @@ func Map[I, O any](Source Interface[I], operator func(I) O) Interface[O] {
 	}
 }
 
+// Filter returns only the values in which operator returns true to.
+func Filter[I any](Source Interface[I], operator func(I) bool) Interface[I] {
+	return &filterImpl[I]{
+		Impl{},
+		Source, operator,
+	}
+}
+
 // Flatten reduces a incoming set of []Ts down to a single set of Ts.
 func Flatten[T any](Source Interface[[]T]) Interface[T] {
 	return &flattenImpl[T]{
