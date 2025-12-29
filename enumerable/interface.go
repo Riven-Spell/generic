@@ -39,6 +39,7 @@ func FromList[O any](in []O, clone bool) Interface[O] {
 
 	return FromFunc(func() (out O, ok bool) {
 		for _, v := range in {
+			in = in[1:]
 			out = v
 			ok = true
 			break

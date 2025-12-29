@@ -68,3 +68,13 @@ func TestZip(t *testing.T) {
 
 	a.Equal(result, Collect(Zip(FromList(inA, true), FromList(inB, true))))
 }
+
+func TestFilter(t *testing.T) {
+	a := assert.New(t)
+	in := []int{1, 2, 3, 4, 5}
+	out := []int{2, 4}
+
+	a.Equal(out, Collect(Filter(FromList(in, false), func(i int) bool {
+		return i%2 == 0
+	})))
+}
