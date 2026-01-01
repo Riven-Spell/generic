@@ -1,6 +1,8 @@
 package enumerable
 
 import (
+	"cmp"
+
 	"github.com/Riven-Spell/generic/dict_tools"
 	"github.com/Riven-Spell/generic/list_tools"
 )
@@ -100,6 +102,26 @@ func Flatten[T any](Source Interface[[]T]) Interface[T] {
 	}
 }
 
+// SortFunc sorts an incoming interface down to a set of single Ts. On the first Next(), this incurs a Collect() in order to sort.
+// sortFunc(a, b) should return a negative number when a < b, a positive number when
+// a > b and zero when a == b or a and b are incomparable in the sense of
+// a strict weak ordering.
+func SortFunc[T any](Source Interface[T], sortFunc func(l, r T) int) Interface[T] {
+	return &sortFuncImpl[T]{
+		Impl{},
+		Source, nil,
+		sortFunc,
+	}
+}
+
+// Sort incurs the same semantics as SortFunc, but relies upon cmp.Ordered to provide the ordering.
+func Sort[T cmp.Ordered](Source Interface[T]) Interface[T] {
+	return &sortImpl[T]{
+		Impl{},
+		Source, nil,
+	}
+}
+
 // ForEach fully executes an incoming Interface returning no values, and performing the requested operation on each value
 func ForEach[T any](Source Interface[T], do func(T)) {
 	Sum[T, any](Source, func(t T, _ any) any {
@@ -108,7 +130,7 @@ func ForEach[T any](Source Interface[T], do func(T)) {
 	})
 }
 
-// Sum reduces an incoming Interface down to a single value, passing the next item and
+// Sum reduces an incoming Interface down to a single value, passing the next item and the current sum in on each call of operator.
 func Sum[I, O any](Source Interface[I], operator func(I, O) O) O {
 	var out O
 	for {
@@ -121,13 +143,14 @@ func Sum[I, O any](Source Interface[I], operator func(I, O) O) O {
 	}
 }
 
-// Collect reduces an incoming interface
+// Collect reduces an incoming interface to a []O.
 func Collect[O any](source Interface[O]) []O {
 	return Sum[O, []O](source, func(object O, list []O) []O {
 		return append(list, object)
 	})
 }
 
+// CollectMap functions like Collect on a key-value pairing.
 func CollectMap[A comparable, B any](Source Interface[AB[A, B]]) map[A]B {
 	return Sum[AB[A, B], map[A]B](Source, func(a AB[A, B], m map[A]B) map[A]B {
 		return dict_tools.SafeAdd(m, a.A, a.B)
